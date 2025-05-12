@@ -1,0 +1,20 @@
+{
+    "$id": "403",
+    "title": "Forbidden",
+    "description": "Access denied.  Insufficient permissions.  Requesting user is likely missing a required role.",
+    "type": "object",
+    "properties": {
+        "statusCode": {
+            "type": "number",
+            "const": 403
+        },
+        "error": {
+            "type": "string",
+            "const": "Forbidden"
+        },
+        "message": {
+            "type": "string",
+            "example": "I know you ain't tryin' to be places you ain't allowed!"
+        }
+    }
+}

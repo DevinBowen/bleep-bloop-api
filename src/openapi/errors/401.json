@@ -1,0 +1,20 @@
+{
+    "$id": "401",
+    "title": "Unauthorized",
+    "description": "Access denied. Requesting user's session is likely expired.",
+    "type": "object",
+    "properties": {
+        "statusCode": {
+            "type": "number",
+            "const": 401
+        },
+        "error": {
+            "type": "string",
+            "const": "Unauthorized"
+        },
+        "message": {
+            "type": "string",
+            "example": "You ain't logged in, child!"
+        }
+    }
+}

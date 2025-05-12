@@ -1,0 +1,57 @@
+{
+    "$id": "auth:postLogin",
+    "schema": {
+        "description": "<strong>Logs into the auth service.</strong>",
+        "tags": [
+            "Auth"
+        ],
+        "summary": "Logs into the auth service.",
+        "security": [
+            {
+                "bearerAuth": []
+            }
+        ],
+        "body": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "email",
+                "password"
+            ]
+        },
+        "response": {
+            "200": {
+                "description": "Success",
+                "type": "object"
+            },
+            "400": {
+                "description": "Bad Request",
+                "$ref": "400#"
+            },
+            "401": {
+                "description": "Unauthorized",
+                "$ref": "401#"
+            },
+            "403": {
+                "description": "Forbidden",
+                "$ref": "403#"
+            },
+            "404": {
+                "description": "Not Found",
+                "$ref": "404#"
+            },
+            "500": {
+                "description": "Internal Server Error",
+                "$ref": "500#"
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "$id": "400",
+    "title": "Bad Request",
+    "description": "Either the format of the request was wrong, or the requesting client failed to provide an authorization header.",
+    "type": "object",
+    "properties": {
+        "statusCode": {
+            "type": "number",
+            "const": 400
+        },
+        "error": {
+            "type": "string",
+            "const": "Bad Request"
+        },
+        "message": {
+            "type": "string",
+            "example": "You ain't be sendin' me the right data format!"
+        }
+    }
+}

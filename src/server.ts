@@ -5,7 +5,7 @@ async function startServer() {
     const app = await buildApp()
 
     const port = config.get<number>('server.port') ?? 3000
-    const host = config.get<string>('server.host') ?? '0.0.0.0'
+    const host = config.get<string>('server.host') ?? 'localhost'
 
     try {
         await app.listen({ port, host })

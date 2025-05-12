@@ -1,0 +1,20 @@
+{
+    "$id": "500",
+    "title": "Internal Server Error",
+    "description": "An error occurred while processing the request.",
+    "type": "object",
+    "properties": {
+        "statusCode": {
+            "type": "number",
+            "const": 500
+        },
+        "error": {
+            "type": "string",
+            "const": "Internal Server Error"
+        },
+        "message": {
+            "type": "string",
+            "example": "Just 'cause I messed up don't mean it be my fault!"
+        }
+    }
+}
