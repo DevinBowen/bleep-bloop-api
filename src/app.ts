@@ -3,6 +3,8 @@ import cors from '@fastify/cors'
 
 import Auth from './routers/auth'
 import Files from './routers/files'
+import Email from './routers/email'
+import Sql from './routers/sql'
 
 export default async function App(): Promise<FastifyInstance> {
     const app = fastify({
@@ -16,6 +18,8 @@ export default async function App(): Promise<FastifyInstance> {
 
     app.register(Auth, { prefix: '/auth' })
     app.register(Files, { prefix: '/files' })
+    app.register(Email, { prefix: '/email' })
+    app.register(Sql, { prefix: '/sql' })
 
     return app
 }
