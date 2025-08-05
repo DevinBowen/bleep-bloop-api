@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { GRFPool } from "../db";
 import { Credientials } from "../types/auth";
 
@@ -16,12 +17,14 @@ export default class AuthService {
                     WHERE username = @username AND password = @password
                 `);
             if (result.recordset.length === 0) {
-                return { success: false, message: 'Invalid credentials' };
+                return { success: false, message: 'Invalid credentials' }
             }
 
-            const user = result.recordset[0];
-            console.log('User logged in:', user);
-            return { success: true, user };
+            const user = result.recordset[0]
+            const token = crypto.randomUUID()
+            console.log('User logged in:', user)
+            console.log('Generated token:', token)
+            return { success: true, user, token }
         } catch (err) {
             console.error('Login error:', err);
             throw new Error('Login failed');
@@ -35,22 +38,22 @@ export default class AuthService {
         try {
             const existingUser = await pool.request()
                 .input('username', username)
-                .query('SELECT * FROM PROD.auth WHERE username = @username');
+                .query('SELECT * FROM PROD.auth WHERE username = @username')
 
             if (existingUser.recordset.length > 0) {
-                return { success: false, message: 'Username already exists' };
+                return { success: false, message: 'Username already exists' }
             }
 
             await pool.request()
                 .input('username', username)
                 .input('password', password)
-                .query('INSERT INTO PROD.auth (username, password) VALUES (@username, @password)');
+                .query('INSERT INTO PROD.auth (username, password) VALUES (@username, @password)')
 
-            console.log('User registered:', username);
-            return { success: true, message: 'User registered successfully' };
+            console.log('User registered:', username)
+            return { success: true, message: 'User registered successfully' }
         } catch (err) {
-            console.error('Registration error:', err);
-            throw new Error('Registration failed');
+            console.error('Registration error:', err)
+            throw new Error('Registration failed')
         }
     }
     

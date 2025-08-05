@@ -12,7 +12,7 @@ export default async function App(): Promise<FastifyInstance> {
     })
 
     await app.register(cors, {
-        origin: ['http://localhost:4200'],
+        origin: ['http://localhost:8080'],
         credentials: false,
     })
 
