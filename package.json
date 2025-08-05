@@ -4,11 +4,11 @@
   "description": "Bleep Bloop API",
   "main": "src/server.ts",
   "scripts": {
+    "build": "cross-env tsc",
+    "start": "cross-env NODE_ENV=production node dist/server.js",
+    "start-dev": "cross-env nodemon --watch src --exec ts-node src/server.ts",
     "package-audit": "npm-audit --low=50 --moderate=50 --high=10",
-    "test": "",
-    "start": "",
-    "start-watch": "nodemon --watch src --exec ts-node src/server.ts",
-    "build": ""
+    "test": ""
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +16,9 @@
     "@types/config": "^3.3.5",
     "@types/mssql": "^9.1.7",
     "@types/node": "^22.15.17",
+    "cross-env": "^10.0.0",
     "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
