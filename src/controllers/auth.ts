@@ -1,4 +1,3 @@
-import Auth from "../routers/auth"
 import AuthService from "../services/auth"
 import { Credientials } from "../types/auth"
 
