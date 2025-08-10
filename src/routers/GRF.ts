@@ -12,8 +12,8 @@ export const GRF: FastifyPluginAsync = async (fastify) => {
         return GRFController.read(req.params)
     })
 
-    fastify.put<{ Params: { id: string } }>('/product/update/:id', async (req, res) => {
-        return GRFController.update(req.params)
+    fastify.put<{ Params: { id: string }, Body: {name?: string, description?: string, price?: number, stock?: number} }>('/product/update/:id', async (req, res) => {
+        return GRFController.productUpdate(req.params, req.body)
     })
 
     fastify.delete<{ Params: { id: string } }>('/product/delete/:id', async (req, res) => {

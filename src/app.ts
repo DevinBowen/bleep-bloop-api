@@ -19,6 +19,7 @@ export default async function App(): Promise<FastifyInstance> {
             'https://gatorridgefarm.com'
         ],
         credentials: false,
+        methods: ['GET', 'POST', 'PUT', 'DELETE']
     })
 
     await app.register(async function (api) {

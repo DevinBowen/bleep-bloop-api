@@ -10,8 +10,8 @@ export class GRFController {
         return GRFServices.read(params)
     }
 
-    static update(params: { id: string }, data?: {name?: string, description?: string, price?: number, stock?: number}) {
-        return GRFServices.update(params)
+    static productUpdate(params: { id: string }, data: {name?: string, description?: string, price?: number, stock?: number}) {
+        return GRFServices.productUpdate(params, data)
     }
 
     static delete(params: { id: string }) {

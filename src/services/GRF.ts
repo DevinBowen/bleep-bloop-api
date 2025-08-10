@@ -20,8 +20,34 @@ export class GRFServices {
         // Implementation for reading a product
     }
 
-    static update(params: { id: string }, data?: {name?: string, description?: string, price?: number, stock?: number}) {
-        // Implementation for updating a product
+    static async productUpdate(params: { id: string }, data: {name?: string, description?: string, price?: number, stock?: number}) {
+        const pool = await GRFPool();
+        const { id } = params;
+        // Build dynamic query parts
+        const updates = [];
+        const request = pool.request().input("id", id);
+        if (data.name !== undefined) {
+            updates.push("name = @name");
+            request.input("name", data.name);
+        }
+        if (data.description !== undefined) {
+            updates.push("description = @description");
+            request.input("description", data.description);
+        }
+        if (data.price !== undefined) {
+            updates.push("price = @price");
+            request.input("price", data.price);
+        }
+        if (data.stock !== undefined) {
+            updates.push("stock = @stock");
+            request.input("stock", data.stock);
+        }
+        if (updates.length === 0) {
+            throw new Error("No fields provided to update.");
+        }
+        const query = `UPDATE PROD.products SET ${updates.join(", ")} WHERE id = @id`;
+        const result = await request.query(query);
+        return { status: 200, message: "Product updated successfully" };
     }
 
     static delete(params: { id: string }) {
