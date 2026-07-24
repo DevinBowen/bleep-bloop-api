@@ -1,3 +1,3 @@
-# BleepBloopPI
+# BleepBloopAPI
 
 API for Bleep Bloop.

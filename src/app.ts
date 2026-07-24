@@ -6,6 +6,7 @@ import Files from './routers/files'
 import Email from './routers/email'
 import Sql from './routers/sql'
 import GRFc from './routers/GRF'
+import SanchezRestore from './routers/sanchezRestore'
 
 export default async function App(): Promise<FastifyInstance> {
     const app = fastify({
@@ -28,6 +29,7 @@ export default async function App(): Promise<FastifyInstance> {
         api.register(Email, { prefix: '/email' })
         api.register(Sql, { prefix: '/sql' })
         api.register(GRFc, { prefix: '/GRF' })
+        api.register(SanchezRestore, { prefix: '/sanchezRestore' })
     }, { prefix: '/api' })
 
     return app
