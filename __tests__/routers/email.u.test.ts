@@ -1,101 +1,110 @@
-import Fastify from 'fastify';
+import Fastify from 'fastify'
+import nodemailer from 'nodemailer'
+import Email from '../../src/routers/email'
 
-// Mock email router - replace with actual import when available
-async function buildApp() {
-  const app = Fastify();
-
-  app.post('/send', async (request, reply) => {
-    const { to, subject, body } = request.body as any;
-    if (!to || !subject || !body) {
-      return reply.status(400).send({ error: 'Missing required fields' });
-    }
-    reply.send({ success: true, message: 'Email sent' });
-  });
-
-  app.get('/templates', async (request, reply) => {
-    reply.send({ templates: [] });
-  });
-
-  return app;
-}
+jest.mock('nodemailer', () => ({
+  __esModule: true,
+  default: {
+    createTransport: jest.fn()
+  }
+}))
 
 describe('Email Router', () => {
-  let app: any;
+  const createTransportMock = nodemailer.createTransport as jest.Mock
+  const sendMailMock = jest.fn()
 
-  beforeEach(async () => {
-    app = await buildApp();
-  });
+  beforeEach(() => {
+    process.env.GMAIL_USER = 'sender@gmail.com'
+    process.env.GMAIL_APP_PASSWORD = 'app-password'
+    process.env.TEST_EMAIL_TO = ''
+    process.env.MAIL_FROM = 'sender@gmail.com'
 
-  describe('POST /send', () => {
-    it('should send an email with valid data', async () => {
-      const response = await app.inject({
-        method: 'POST',
-        url: '/send',
-        payload: {
-          to: 'test@example.com',
-          subject: 'Test Subject',
-          body: 'Test Body',
-        },
-      });
+    sendMailMock.mockResolvedValue({
+      messageId: 'mock-message-id',
+      accepted: ['receiver@gmail.com'],
+      rejected: []
+    })
 
-      expect(response.statusCode).toBe(200);
-      expect(response.json().success).toBe(true);
-      expect(response.json().message).toBe('Email sent');
-    });
+    createTransportMock.mockReturnValue({
+      sendMail: sendMailMock
+    })
+  })
 
-    it('should return 400 when missing recipient', async () => {
-      const response = await app.inject({
-        method: 'POST',
-        url: '/send',
-        payload: {
-          subject: 'Test Subject',
-          body: 'Test Body',
-        },
-      });
+  afterEach(() => {
+    jest.clearAllMocks()
+    delete process.env.GMAIL_USER
+    delete process.env.GMAIL_APP_PASSWORD
+    delete process.env.TEST_EMAIL_TO
+    delete process.env.MAIL_FROM
+  })
 
-      expect(response.statusCode).toBe(400);
-      expect(response.json().error).toBeDefined();
-    });
+  async function buildApp() {
+    const app = Fastify()
+    await app.register(Email, { prefix: '/email' })
+    return app
+  }
 
-    it('should return 400 when missing subject', async () => {
-      const response = await app.inject({
-        method: 'POST',
-        url: '/send',
-        payload: {
-          to: 'test@example.com',
-          body: 'Test Body',
-        },
-      });
+  it('returns 400 if no recipient is provided', async () => {
+    const app = await buildApp()
 
-      expect(response.statusCode).toBe(400);
-      expect(response.json().error).toBeDefined();
-    });
+    const response = await app.inject({
+      method: 'POST',
+      url: '/email/test',
+      payload: {}
+    })
 
-    it('should return 400 when missing body', async () => {
-      const response = await app.inject({
-        method: 'POST',
-        url: '/send',
-        payload: {
-          to: 'test@example.com',
-          subject: 'Test Subject',
-        },
-      });
+    expect(response.statusCode).toBe(400)
+    expect(response.json().success).toBe(false)
+    expect(response.json().error).toMatch(/Recipient email is required/)
+  })
 
-      expect(response.statusCode).toBe(400);
-      expect(response.json().error).toBeDefined();
-    });
-  });
+  it('returns 500 when Gmail credentials are missing', async () => {
+    delete process.env.GMAIL_USER
+    const app = await buildApp()
 
-  describe('GET /templates', () => {
-    it('should return email templates', async () => {
-      const response = await app.inject({
-        method: 'GET',
-        url: '/templates',
-      });
+    const response = await app.inject({
+      method: 'POST',
+      url: '/email/test',
+      payload: {
+        to: 'receiver@gmail.com'
+      }
+    })
 
-      expect(response.statusCode).toBe(200);
-      expect(response.json().templates).toBeDefined();
-      expect(Array.isArray(response.json().templates)).toBe(true);
-    });
-  });
-});
+    expect(response.statusCode).toBe(500)
+    expect(response.json().success).toBe(false)
+    expect(response.json().error).toMatch(/Missing Gmail credentials/)
+  })
+
+  it('sends a test email and returns success metadata', async () => {
+    const app = await buildApp()
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/email/test',
+      payload: {
+        to: 'receiver@gmail.com',
+        subject: 'Test Subject',
+        text: 'Test Body'
+      }
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json().success).toBe(true)
+    expect(response.json().messageId).toBe('mock-message-id')
+
+    expect(createTransportMock).toHaveBeenCalledWith({
+      service: 'gmail',
+      auth: {
+        user: 'sender@gmail.com',
+        pass: 'app-password'
+      }
+    })
+
+    expect(sendMailMock).toHaveBeenCalledWith({
+      from: 'sender@gmail.com',
+      to: 'receiver@gmail.com',
+      subject: 'Test Subject',
+      text: 'Test Body'
+    })
+  })
+})
