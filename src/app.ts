@@ -17,7 +17,9 @@ export default async function App(): Promise<FastifyInstance> {
     await app.register(cors, {
         origin: [
             'http://localhost:8080',
-            'https://gatorridgefarm.com'
+            'https://gatorridgefarm.com',
+            'https://sanchezrestore.com',
+            'https://sanchezdetail.com'
         ],
         credentials: false,
         methods: ['GET', 'POST', 'PUT', 'DELETE']
