@@ -4,7 +4,7 @@ import EmailService from '../services/email'
 interface CreateEmailRequest {
 	to?: string
 	subject?: string
-	text?: string
+	body?: string
 }
 
 export default class EmailController {
@@ -12,16 +12,16 @@ export default class EmailController {
 	static async create(req: FastifyRequest<{ Body: CreateEmailRequest }>, res: FastifyReply) {
 		const gmailUser = process.env.GMAIL_USER
 		const gmailAppPassword = process.env.GMAIL_APP_PASSWORD
-		const defaultRecipient = process.env.TEST_EMAIL_TO
+		const defaultRecipient = process.env.DEFAULT_EMAIL_TO
 
 		const to = req.body?.to ?? defaultRecipient
-		const subject = req.body?.subject ?? 'Bleep Bloop API test email'
-		const text = req.body?.text ?? 'This is a test email sent from the Bleep Bloop API.'
+		const subject = decodeURIComponent(req.body?.subject ?? 'Bleep Bloop API test email')
+		const text = req.body?.body ?? 'This is a test email sent from the Bleep Bloop API.'
 
 		if (!to) {
 			return res.status(400).send({
 				success: false,
-				error: 'Recipient email is required. Provide body.to or set TEST_EMAIL_TO.'
+				error: 'Recipient email is required. Provide body.to or set DEFAULT_EMAIL_TO.'
 			})
 		}
 
@@ -35,7 +35,7 @@ export default class EmailController {
 
 		try {
 			const info = await EmailService.send({
-				from: process.env.MAIL_FROM ?? gmailUser,
+				from: process.env.DEFAULT_EMAIL_FROM ?? gmailUser,
 				to,
 				subject,
 				text

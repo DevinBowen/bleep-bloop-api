@@ -10,7 +10,7 @@ import SanchezRestore from './routers/sanchezRestore'
 
 export default async function App(): Promise<FastifyInstance> {
     const app = fastify({
-        logger: process.env.NODE_ENV !== 'production',
+        logger: true,
         trustProxy: true
     })
 
