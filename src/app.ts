@@ -10,13 +10,13 @@ import SanchezRestore from './routers/sanchezRestore'
 
 export default async function App(): Promise<FastifyInstance> {
     const app = fastify({
-        logger: false,
+        logger: process.env.NODE_ENV !== 'production',
         trustProxy: true
     })
 
     await app.register(cors, {
         origin: [
-            'http://localhost:8080',
+            /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,
             'https://gatorridgefarm.com',
             'https://sanchezrestore.com',
             'https://sanchezdetail.com'
