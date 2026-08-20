@@ -1,0 +1,75 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: beep-software/beep-client
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vue app
+        run: npm run build
+
+      - name: Upload production build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          TAG=${{ github.sha }}
+
+          docker build -t $IMAGE:$TAG .
+          docker push $IMAGE:$TAG
+
+      - name: Deploy to k3s
+        if: github.event_name == 'push'
+        env:
+          KUBECONFIG: /tmp/.kube/config
+        run: |
+          mkdir -p /tmp/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > /tmp/.kube/config
+
+          kubectl set image deployment/beep-client \
+            beep-client=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --insecure-skip-tls-verify
+
+          kubectl rollout status deployment/beep-client \
+            --insecure-skip-tls-verify \
+            --timeout=5m
