@@ -12,7 +12,7 @@ env:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, k3s]
 
     permissions:
       contents: read
@@ -61,15 +61,10 @@ jobs:
       - name: Deploy to k3s
         if: github.event_name == 'push'
         env:
-          KUBECONFIG: /tmp/.kube/config
+          KUBECONFIG: /etc/rancher/k3s/k3s.yaml
         run: |
-          mkdir -p /tmp/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > /tmp/.kube/config
-
           kubectl set image deployment/beep-client \
-            beep-client=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --insecure-skip-tls-verify
+            beep-client=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
           kubectl rollout status deployment/beep-client \
-            --insecure-skip-tls-verify \
             --timeout=5m
