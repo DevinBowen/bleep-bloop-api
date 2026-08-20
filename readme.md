@@ -43,3 +43,5 @@ curl -X POST "http://localhost:1337/api/email/test" \
 ```
 
 Expected successful response includes `success: true` and a `messageId`.
+
+This is a test
