@@ -61,10 +61,10 @@ jobs:
       - name: Deploy to k3s
         if: github.event_name == 'push'
         env:
-          KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+            KUBECONFIG: /home/dobowe01/.kube/config
         run: |
-          kubectl set image deployment/beep-client \
+            kubectl set image deployment/beep-client \
             beep-client=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-          kubectl rollout status deployment/beep-client \
+            kubectl rollout status deployment/beep-client \
             --timeout=5m
