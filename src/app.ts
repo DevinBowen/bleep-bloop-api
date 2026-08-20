@@ -14,6 +14,10 @@ export default async function App(): Promise<FastifyInstance> {
         trustProxy: true
     })
 
+    app.get('/health', async () => {
+        return { status: 'ok' }
+    })
+
     await app.register(cors, {
         origin: [
             /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,

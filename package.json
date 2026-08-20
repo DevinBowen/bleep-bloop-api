@@ -7,7 +7,7 @@
     "build": "cross-env tsc",
     "start": "cross-env NODE_ENV=production node dist/server.js",
     "start-local": "cross-env NODE_ENV=local-test nodemon --watch src --exec ts-node src/server.ts",
-    "start-dev": "cross-env nodemon --watch src --exec ts-node src/server.ts",
+    "start-dev": "cross-env NODE_ENV=dev-testing nodemon --watch src --exec ts-node src/server.ts",
     "package-audit": "npm-audit --low=50 --moderate=50 --high=10",
     "test": "jest --config jest.config.ts"
   },
