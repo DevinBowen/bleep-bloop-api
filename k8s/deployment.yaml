@@ -21,7 +21,7 @@ spec:
         - name: ghcr-secret
       containers:
         - name: bleep-bloop-api
-          image: ghcr.io/devinbowen/bleep-bloop-api:latest
+          image: ghcr.io/beep-software/bleep-bloop-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
