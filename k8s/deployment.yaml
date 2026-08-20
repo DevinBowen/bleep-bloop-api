@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bleep-bloop-api
+  namespace: default
+  labels:
+    app: bleep-bloop-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bleep-bloop-api
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: bleep-bloop-api
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: bleep-bloop-api
+          image: ghcr.io/devinbowen/bleep-bloop-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 30
