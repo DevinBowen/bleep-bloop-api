@@ -58,6 +58,7 @@ jobs:
           KUBECONFIG: /home/dobowe01/.kube/config
         run: |
           kubectl create secret generic bleep-bloop-api-email \
+            -n bleep-api \
             --from-literal=GMAIL_USER="${{ secrets.GMAIL_USER }}" \
             --from-literal=GMAIL_APP_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}" \
             --from-literal=DEFAULT_EMAIL_TO="${{ secrets.DEFAULT_EMAIL_TO }}" \
@@ -69,7 +70,9 @@ jobs:
           KUBECONFIG: /home/dobowe01/.kube/config
         run: |
           kubectl set image deployment/bleep-bloop-api \
-            bleep-bloop-api=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            bleep-bloop-api=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -n bleep-api
 
           kubectl rollout status deployment/bleep-bloop-api \
+            -n bleep-api \
             --timeout=5m
