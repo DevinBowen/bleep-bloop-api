@@ -38,3 +38,21 @@ spec:
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 30
+          env:
+            - name: GMAIL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: bleep-bloop-api-email
+                  key: GMAIL_USER
+
+            - name: GMAIL_APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bleep-bloop-api-email
+                  key: GMAIL_APP_PASSWORD
+
+            - name: DEFAULT_EMAIL_TO
+              valueFrom:
+                secretKeyRef:
+                  name: bleep-bloop-api-email
+                  key: DEFAULT_EMAIL_TO
