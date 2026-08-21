@@ -45,6 +45,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build and push Docker image
+        if: github.event_name == 'push'
         run: |
           IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           TAG=${{ github.sha }}
@@ -64,7 +65,15 @@ jobs:
             --from-literal=DEFAULT_EMAIL_TO="${{ secrets.DEFAULT_EMAIL_TO }}" \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Deploy to k3s
+      - name: Apply Kubernetes manifests
+        if: github.event_name == 'push'
+        env:
+          KUBECONFIG: /home/dobowe01/.kube/config
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Update image
         if: github.event_name == 'push'
         env:
           KUBECONFIG: /home/dobowe01/.kube/config
@@ -73,6 +82,11 @@ jobs:
             bleep-bloop-api=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             -n bleep-api
 
+      - name: Wait for deployment
+        if: github.event_name == 'push'
+        env:
+          KUBECONFIG: /home/dobowe01/.kube/config
+        run: |
           kubectl rollout status deployment/bleep-bloop-api \
             -n bleep-api \
             --timeout=5m
